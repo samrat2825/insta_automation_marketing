@@ -117,10 +117,11 @@ class bot:
 
 
 def init():
+    print("Logging In")
     bot(insta_username, insta_password, user, message_)
 
     # when our program ends it will show "done".
-    input("DONE")
+    print("DONE")
 
 
 # calling the function

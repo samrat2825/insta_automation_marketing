@@ -1,7 +1,7 @@
 from csv import DictWriter
+import csv
 
-field_names = ['name', 'username', 'password',
-               'email', 'gender', 'birthday']
+field_names = ['username', 'password']
 
 
 def store_credentials(user):
@@ -11,31 +11,108 @@ def store_credentials(user):
         csvfile.close()
 
 
-def store_usernames(leads):
-    print(leads)
-    new_leads = set()
-    with open('Assets/leads.txt', 'r') as leadsFile:
-        curr_leads = leadsFile.readlines()
-        for lead in curr_leads:
-            new_leads.add(lead)
-        leadsFile.close()
+# def store_usernames(leads):
+#     print(leads)
+#     new_leads = set()
+#     with open('Assets/leads.txt', 'r') as leadsFile:
+#         curr_leads = leadsFile.readlines()
+#         for lead in curr_leads:
+#             new_leads.add(lead)
+#         leadsFile.close()
 
-    for lead in leads:
-        new_leads.add(lead)
+#     for lead in leads:
+#         new_leads.add(lead)
 
-    print(new_leads)
+#     print(new_leads)
 
-    with open('Assets/leads.txt', 'w') as leadsFile:
-        L = list(new_leads)
-        leadsFile.writelines(L)
-        leadsFile.close()
+#     with open('Assets/leads.txt', 'w') as leadsFile:
+#         for lead in new_leads:
+#             leadsFile.write(lead + "\n")
+#         leadsFile.close()
 
 
-def fetch_leads():
+def store_posts(post_links):
+    print(post_links)
+    new_posts = set()
+    with open('Assets/posts.txt', 'r') as postsFile:
+        curr_posts = postsFile.readlines()
+        for post_link in curr_posts:
+            new_posts.add(post_link)
+        postsFile.close()
+
+    for post_link in post_links:
+        new_posts.add(post_link)
+
+    print(new_posts)
+
+    with open('Assets/posts.txt', 'w') as postsFile:
+        for post_link in new_posts:
+            postsFile.write(post_link + "\n")
+        postsFile.close()
+
+
+def preprocess_leads():
     new_leads = []
-    with open('Assets/leads.txt', 'r') as leadsFile:
+    with open('Assets/hashtags.txt', 'r') as leadsFile:
         curr_leads = leadsFile.readlines()
         for lead in curr_leads:
             new_leads.append(lead)
         leadsFile.close()
-    return new_leads
+
+    leads = str(new_leads[0])
+    new_leads = leads.split(' ')
+    leads = new_leads
+    new_leads = []
+    for lead in leads:
+        if (lead[1:]).isalpha():
+            new_leads.append(lead)
+        else:
+            print(lead)
+
+    with open('Assets/hashtags.txt', 'w') as leadsFile:
+        for lead in new_leads:
+            leadsFile.write(lead + "\n")
+        leadsFile.close()
+    print(new_leads)
+
+
+def fetch_comments():
+    print("Fetching Comments")
+    with open('Assets/comments.txt', 'r', encoding='utf-8') as commentsfile:
+        comments = commentsfile.readlines()
+        data = []
+        for comment in comments:
+            comment = comment[:-1]
+            data.append(comment)
+        commentsfile.close()
+        # print(data)
+        return data
+
+
+def fetch_leads():
+    print("Fetching Hastags")
+    with open('Assets/hashtags.txt', 'r', encoding='utf-8') as leadsFile:
+        curr_leads = leadsFile.readlines()
+        new_leads = []
+        for lead in curr_leads:
+            new_leads.append(lead)
+        leadsFile.close()
+        return new_leads
+
+
+def fetch_credentials():
+    print("Fetching Credentials")
+    with open('Assets/username.csv', 'r') as file:
+        csvreader = csv.reader(file)
+        header = next(csvreader)
+        print(header)
+        rows = []
+        for row in csvreader:
+            if len(row) > 0:
+                rows.append(row)
+        file.close()
+        return rows
+
+
+# fetch_comments()
+# fetch_leads()
