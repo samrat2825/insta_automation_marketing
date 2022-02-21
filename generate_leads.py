@@ -23,7 +23,7 @@ def generate_posts_by_tag(driver, tag):
     output = []
     for elem in all_a_tags:
         href = elem.get_attribute("href")
-        print(href)
+        # print(href)
         if href.find('/p/') != -1:
             output.append(href)
     # driver.close()
@@ -35,15 +35,43 @@ def fetch_liked_by(driver):
     time.sleep(8)
     driver.find_element_by_xpath(
         '//*[@id="react-root"]/section/main/div/div[1]/article/div/div[2]/div/div[2]/section[2]/div/div/div/a').click()
-    all_a_tags = driver.find_elements_by_tag_name('a')
-    output = []
-    for elem in all_a_tags:
-        href = elem.get_attribute("href")
-        # if href.find('/p/') != -1:
-        output.append(href)
-    # driver.close()
-    print(output)
-    # return output
+    time.sleep(4)
+
+    try:
+        users = []
+
+        height = driver.find_element_by_xpath(
+            "/html/body/div[6]/div/div/div[2]/div/div").value_of_css_property("padding-top")
+        match = False
+        while match == False:
+            lastHeight = height
+
+            # step 1
+            elements = []
+            elements = driver.find_elements_by_xpath(
+                "//a[@class='notranslate']")
+
+            # step 2
+            print(elements)
+            for element in elements:
+                if element.get_attribute('title') not in users:
+                    users.append(element.get_attribute('title'))
+
+            # step 3
+            driver.execute_script(
+                "return arguments[0].scrollIntoView();", elements[-1])
+            time.sleep(1)
+
+            # step 4
+            height = driver.find_element_by_xpath(
+                "/html/body/div[6]/div/div/div[2]/div/div").value_of_css_property("padding-top")
+            if lastHeight == height:
+                match = True
+
+        print(users)
+        print(len(users))
+    except Exception as e:
+        print(e)
 
 
 def save_post(driver):
@@ -58,17 +86,17 @@ def like_post(driver):
     like_button.click()
 
 
-def generate_leads(driver, tags):
-    comments = fetch_comments()
+def generate_leads(driver, tags, comments):
     # output = set()
     for tag in tags:
         tag = tag[1:]
         tag = tag[:-1]
         print(tag)
-        posts_links = generate_posts_by_tag(driver, tag)
-        store_posts(posts_links)
-        print(posts_links)
-        posts_links = posts_links[:1]
+        # posts_links = generate_posts_by_tag(driver, tag)
+        # store_posts(posts_links)
+        # print(posts_links)
+        # posts_links = posts_links[:1]
+        posts_links = ['https://www.instagram.com/p/CaNX_iPuTq1/']
         for post_link in posts_links:
             try:
                 url = post_link
@@ -77,20 +105,20 @@ def generate_leads(driver, tags):
                 # driver = webdriver.Chrome(
                 #     executable_path=config.Config['chromedriver_path'], options=chrome_options)
                 driver.get(url)
-                driver.refresh()
+                # driver.refresh()
                 sleep(3)
 
-                print('Commenting')
-                comment_box = WebDriverWait(driver, 20).until(
-                    expected_conditions.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/textarea')))
-                print(random.choice(comments))
-                comment_box.send_keys(random.choice(comments))
+                # print('Commenting')
+                # comment_box = WebDriverWait(driver, 20).until(
+                #     expected_conditions.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/textarea')))
+                # comment = random.choice(comments)
+                # comment_box.send_keys(comment)
 
-                sleep(5)
-                driver.find_element_by_xpath(
-                    '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/button').click()
-                print('Commented on', url)
-                # fetch_liked_by(driver)
+                # sleep(5)
+                # driver.find_element_by_xpath(
+                #     '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/button').click()
+                # print('Commented on', url)
+                fetch_liked_by(driver)
 
                 # driver.find_element_by_xpath(
                 #     '/html[1]/body[1]/div[1]/section[1]/main[1]/div[1]/div[1]/article[1]/div[1]/div[2]/div[1]/div[1]/div[1]/header[1]/div[2]/div[1]/div[1]/div[1]/a[1]').click()
@@ -98,8 +126,9 @@ def generate_leads(driver, tags):
                 # sleep(3)
                 # output.add(driver.current_url.split('/')[-2:-1][0])
                 # driver.close()
-            except:
-                print(post_link)
+            except Exception as e:
+                print("\n###########################")
+                print("Error", post_link, e)
 
 
 def login_instagram(driver, username, password):
@@ -115,10 +144,13 @@ def login_instagram(driver, username, password):
 
 credentials = fetch_credentials()
 tags = fetch_leads()
+comments = fetch_comments()
 tags = tags[:1]
 for i, credential in enumerate(credentials):
     if i == 0:
         continue
+    if i > 1:
+        break
     # chrome_options = Options()
     # chrome_options.add_argument("--headless")
     # driver = webdriver.Chrome(
@@ -128,6 +160,7 @@ for i, credential in enumerate(credentials):
 
     print(credential[0], credential[1])
     login_instagram(driver, credential[0], credential[1])
-    generate_leads(driver, tags)
     time.sleep(5)
+    print(driver.title)
+    generate_leads(driver, tags, comments)
     driver.close()
