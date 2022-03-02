@@ -2,7 +2,7 @@ import modules.config as config
 from selenium import webdriver
 from time import sleep
 from selenium.webdriver.chrome.options import Options
-from modules.utility_methods import fetch_comments, fetch_credentials, fetch_leads, store_posts
+from modules.utility_methods import fetch_comments, fetch_credentials, fetch_leads, store_posts, store_leads
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions
@@ -23,15 +23,13 @@ def generate_posts_by_tag(driver, tag):
     output = []
     for elem in all_a_tags:
         href = elem.get_attribute("href")
-        # print(href)
         if href.find('/p/') != -1:
             output.append(href)
-    # driver.close()
     return output
 
 
 def fetch_liked_by(driver):
-    print("fetching likes")
+    # print("fetching likes")
     time.sleep(8)
     driver.find_element_by_xpath(
         '//*[@id="react-root"]/section/main/div/div[1]/article/div/div[2]/div/div[2]/section[2]/div/div/div/a').click()
@@ -52,7 +50,7 @@ def fetch_liked_by(driver):
                 "//a[@class='notranslate']")
 
             # step 2
-            print(elements)
+            # print(elements)
             for element in elements:
                 if element.get_attribute('title') not in users:
                     users.append(element.get_attribute('title'))
@@ -68,8 +66,9 @@ def fetch_liked_by(driver):
             if lastHeight == height:
                 match = True
 
-        print(users)
-        print(len(users))
+        store_leads(users)
+        # print(users)
+        # print(len(users))
     except Exception as e:
         print(e)
 
@@ -86,26 +85,19 @@ def like_post(driver):
     like_button.click()
 
 
-def generate_leads(driver, tags, comments):
-    # output = set()
+def generate_leads(driver, tags):
     for tag in tags:
-        tag = tag[1:]
-        tag = tag[:-1]
+        tag = tag[1:]  # remove #
+        tag = tag[:-1]  # remove \n
         print(tag)
-        # posts_links = generate_posts_by_tag(driver, tag)
-        # store_posts(posts_links)
+        posts_links = generate_posts_by_tag(driver, tag)
+        store_posts(posts_links)
         # print(posts_links)
-        # posts_links = posts_links[:1]
-        posts_links = ['https://www.instagram.com/p/CaNX_iPuTq1/']
         for post_link in posts_links:
             try:
                 url = post_link
-                # chrome_options = Options()
-                # chrome_options.add_argument("--headless")
-                # driver = webdriver.Chrome(
-                #     executable_path=config.Config['chromedriver_path'], options=chrome_options)
                 driver.get(url)
-                # driver.refresh()
+                driver.refresh()
                 sleep(3)
 
                 # print('Commenting')
@@ -142,25 +134,17 @@ def login_instagram(driver, username, password):
     enter_password.send_keys(Keys.RETURN)
 
 
-credentials = fetch_credentials()
-tags = fetch_leads()
-comments = fetch_comments()
-tags = tags[:1]
-for i, credential in enumerate(credentials):
-    if i == 0:
-        continue
-    if i > 1:
-        break
-    # chrome_options = Options()
-    # chrome_options.add_argument("--headless")
-    # driver = webdriver.Chrome(
-    #     executable_path=config.Config['chromedriver_path'], options=chrome_options)
-    driver = webdriver.Chrome(
-        executable_path=config.Config['chromedriver_path'])
+def generate_leads():
+    credentials = fetch_credentials()[0]
+    tags = fetch_leads()
+    for tag in tags:
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        driver = webdriver.Chrome(
+            ChromeDriverManager().install(), options=chrome_options)
 
-    print(credential[0], credential[1])
-    login_instagram(driver, credential[0], credential[1])
-    time.sleep(5)
-    print(driver.title)
-    generate_leads(driver, tags, comments)
-    driver.close()
+        print(credentials[0], credentials[1])
+        login_instagram(driver, credentials[0], credentials[1])
+        time.sleep(5)
+        generate_leads(driver, tags)
+        driver.close()
