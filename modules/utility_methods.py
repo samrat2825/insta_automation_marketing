@@ -11,28 +11,8 @@ def store_credentials(user):
         csvfile.close()
 
 
-# def store_usernames(leads):
-#     print(leads)
-#     new_leads = set()
-#     with open('Assets/leads.txt', 'r') as leadsFile:
-#         curr_leads = leadsFile.readlines()
-#         for lead in curr_leads:
-#             new_leads.add(lead)
-#         leadsFile.close()
-
-#     for lead in leads:
-#         new_leads.add(lead)
-
-#     print(new_leads)
-
-#     with open('Assets/leads.txt', 'w') as leadsFile:
-#         for lead in new_leads:
-#             leadsFile.write(lead + "\n")
-#         leadsFile.close()
-
-
 def store_posts(post_links):
-    print(post_links)
+    # print(post_links)
     new_posts = set()
     with open('Assets/posts.txt', 'r') as postsFile:
         curr_posts = postsFile.readlines()
@@ -41,11 +21,32 @@ def store_posts(post_links):
         postsFile.close()
 
     for post_link in post_links:
-        new_posts.add(post_link)
+        if len(post_link) > 0:
+            new_posts.add(post_link)
 
-    print(new_posts)
+    # print(new_posts)
 
     with open('Assets/posts.txt', 'w') as postsFile:
+        for post_link in new_posts:
+            postsFile.write(post_link + "\n")
+        postsFile.close()
+
+
+def store_leads(leads):
+    new_posts = set()
+    with open('Assets/leads.txt', 'r') as postsFile:
+        curr_posts = postsFile.readlines()
+        for post_link in curr_posts:
+            new_posts.add(post_link)
+        postsFile.close()
+
+    for lead in leads:
+        if len(lead) > 0:
+            new_posts.add(lead)
+
+    # print(new_posts)
+
+    with open('Assets/leads.txt', 'w') as postsFile:
         for post_link in new_posts:
             postsFile.write(post_link + "\n")
         postsFile.close()
@@ -100,12 +101,22 @@ def fetch_leads():
         return new_leads
 
 
+def fetch_posts():
+    print("Fetching Post Links")
+    with open('Assets/posts.txt', 'r', encoding='utf-8') as leadsFile:
+        curr_leads = leadsFile.readlines()
+        new_leads = []
+        for lead in curr_leads:
+            new_leads.append(lead)
+        leadsFile.close()
+        return new_leads
+
+
 def fetch_credentials():
     print("Fetching Credentials")
     with open('Assets/username.csv', 'r') as file:
         csvreader = csv.reader(file)
         header = next(csvreader)
-        print(header)
         rows = []
         for row in csvreader:
             if len(row) > 0:
@@ -114,5 +125,6 @@ def fetch_credentials():
         return rows
 
 
+# print(fetch_credentials())
 # fetch_comments()
 # fetch_leads()
