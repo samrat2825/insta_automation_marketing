@@ -32,7 +32,7 @@ def start_posting(driver, comment, post_links):
         driver.refresh()
         sleep(3)
 
-        print('Commenting')
+        print('Commenting', comment)
         comment_box = WebDriverWait(driver, 20).until(
             expected_conditions.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/textarea')))
         comment_box.send_keys(comment)
@@ -72,12 +72,15 @@ def post_comments():
     post_links = fetch_posts()
     for i, credentail in enumerate(credentials):
         chrome_options = Options()
-        chrome_options.add_argument("--headless")
+        # chrome_options.add_argument("--headless")
         driver = webdriver.Chrome(
             ChromeDriverManager().install(), options=chrome_options)
 
-        print(credentials[0], credentials[1])
-        login_instagram(driver, credentials[0], credentials[1])
+        print(credentail[0], credentail[1])
         time.sleep(5)
-        start_posting(driver, random.choice(comments), post_links)
+        login_instagram(driver, credentail[0], credentail[1])
+        time.sleep(20)
+        signed_in = "onetap"
+        if signed_in in driver.current_url:
+            start_posting(driver, random.choice(comments), post_links)
         driver.close()

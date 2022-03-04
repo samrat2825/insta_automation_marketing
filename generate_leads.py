@@ -85,7 +85,7 @@ def like_post(driver):
     like_button.click()
 
 
-def generate_leads(driver, tags):
+def generate_leads_util(driver, tags):
     for tag in tags:
         tag = tag[1:]  # remove #
         tag = tag[:-1]  # remove \n
@@ -110,7 +110,7 @@ def generate_leads(driver, tags):
                 # driver.find_element_by_xpath(
                 #     '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/button').click()
                 # print('Commented on', url)
-                fetch_liked_by(driver)
+                # fetch_liked_by(driver)
 
                 # driver.find_element_by_xpath(
                 #     '/html[1]/body[1]/div[1]/section[1]/main[1]/div[1]/div[1]/article[1]/div[1]/div[2]/div[1]/div[1]/div[1]/header[1]/div[2]/div[1]/div[1]/div[1]/a[1]').click()
@@ -135,6 +135,7 @@ def login_instagram(driver, username, password):
 
 
 def generate_leads():
+    print("Generating Leads")
     credentials = fetch_credentials()[0]
     tags = fetch_leads()
     for tag in tags:
@@ -146,5 +147,5 @@ def generate_leads():
         print(credentials[0], credentials[1])
         login_instagram(driver, credentials[0], credentials[1])
         time.sleep(5)
-        generate_leads(driver, tags)
+        generate_leads_util(driver, tags)
         driver.close()
