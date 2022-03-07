@@ -27,17 +27,23 @@ def like_post(driver):
 
 def start_posting(driver, comment, post_links):
     url = random.choice(post_links)
+    while len(url) < 1:
+        url = random.choice(post_links)
     try:
         driver.get(url)
         driver.refresh()
         sleep(3)
 
         print('Commenting', comment)
-        comment_box = WebDriverWait(driver, 20).until(
-            expected_conditions.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/textarea')))
-        comment_box.send_keys(comment)
+        sleep(8)
+        driver.find_element_by_xpath(
+            '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/textarea').send_keys(comment)
+        # comment_box = WebDriverWait(driver, 30).until(
+        #     expected_conditions.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/textarea')))
+        # comment_box.send_keys(comment)
 
         sleep(5)
+        print('Comment Send')
         driver.find_element_by_xpath(
             '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/button').click()
         print('Commented on', url)

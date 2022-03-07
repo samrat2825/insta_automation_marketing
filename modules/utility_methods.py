@@ -32,6 +32,19 @@ def store_posts(post_links):
         postsFile.close()
 
 
+def store_updated_posts(post_links):
+    new_posts = set()
+    for post_link in post_links:
+        if len(post_link) > 2:
+            new_posts.add(post_link)
+
+    # print(len(new_posts))
+    with open('Assets/posts.txt', 'w') as postsFile:
+        for post_link in new_posts:
+            postsFile.write(post_link)
+        postsFile.close()
+
+
 def store_leads(leads):
     new_posts = set()
     with open('Assets/leads.txt', 'r') as postsFile:

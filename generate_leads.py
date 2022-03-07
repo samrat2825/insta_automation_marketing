@@ -85,42 +85,42 @@ def like_post(driver):
     like_button.click()
 
 
-def generate_leads_util(driver, tags):
-    for tag in tags:
-        tag = tag[1:]  # remove #
-        tag = tag[:-1]  # remove \n
-        print(tag)
-        posts_links = generate_posts_by_tag(driver, tag)
-        store_posts(posts_links)
-        # print(posts_links)
-        for post_link in posts_links:
-            try:
-                url = post_link
-                driver.get(url)
-                driver.refresh()
-                sleep(3)
+def generate_leads_util(driver, tag):
+    # for tag in tags:
+    tag = tag[1:]  # remove #
+    tag = tag[:-1]  # remove \n
+    print(tag)
+    posts_links = generate_posts_by_tag(driver, tag)
+    store_posts(posts_links)
+    # print(posts_links)
+    # for post_link in posts_links:
+    #     try:
+    #         url = post_link
+    #         driver.get(url)
+    #         driver.refresh()
+    #         sleep(3)
 
-                # print('Commenting')
-                # comment_box = WebDriverWait(driver, 20).until(
-                #     expected_conditions.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/textarea')))
-                # comment = random.choice(comments)
-                # comment_box.send_keys(comment)
+    #         print('Commenting')
+    #         comment_box = WebDriverWait(driver, 20).until(
+    #             expected_conditions.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/textarea')))
+    #         comment = random.choice(comments)
+    #         comment_box.send_keys(comment)
 
-                # sleep(5)
-                # driver.find_element_by_xpath(
-                #     '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/button').click()
-                # print('Commented on', url)
-                # fetch_liked_by(driver)
+    #         sleep(5)
+    #         driver.find_element_by_xpath(
+    #             '//*[@id="react-root"]/section/main/div/div/article/div/div[2]/div/div[2]/section[3]/div/form/button').click()
+    #         print('Commented on', url)
+    #         fetch_liked_by(driver)
 
-                # driver.find_element_by_xpath(
-                #     '/html[1]/body[1]/div[1]/section[1]/main[1]/div[1]/div[1]/article[1]/div[1]/div[2]/div[1]/div[1]/div[1]/header[1]/div[2]/div[1]/div[1]/div[1]/a[1]').click()
+    #         driver.find_element_by_xpath(
+    #             '/html[1]/body[1]/div[1]/section[1]/main[1]/div[1]/div[1]/article[1]/div[1]/div[2]/div[1]/div[1]/div[1]/header[1]/div[2]/div[1]/div[1]/div[1]/a[1]').click()
 
-                # sleep(3)
-                # output.add(driver.current_url.split('/')[-2:-1][0])
-                # driver.close()
-            except Exception as e:
-                print("\n###########################")
-                print("Error", post_link, e)
+    #         sleep(3)
+    #         output.add(driver.current_url.split('/')[-2:-1][0])
+    #         # driver.close()
+    #     except Exception as e:
+    #         print("\n###########################")
+    #         print("Error", post_link, e)
 
 
 def login_instagram(driver, username, password):
@@ -138,14 +138,14 @@ def generate_leads():
     print("Generating Leads")
     credentials = fetch_credentials()[0]
     tags = fetch_leads()
-    for tag in tags:
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome(
-            ChromeDriverManager().install(), options=chrome_options)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome(
+        ChromeDriverManager().install(), options=chrome_options)
 
-        print(credentials[0], credentials[1])
-        login_instagram(driver, credentials[0], credentials[1])
-        time.sleep(5)
-        generate_leads_util(driver, tags)
-        driver.close()
+    print(credentials[0], credentials[1])
+    login_instagram(driver, credentials[0], credentials[1])
+    time.sleep(5)
+    for tag in tags:
+        generate_leads_util(driver, tag)
+    driver.close()
